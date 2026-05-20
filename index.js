@@ -1,14 +1,22 @@
-const dns = require("node:dns");
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+// const dns = require("node:dns");
+// dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 const express = require('express')
+const cors = require('cors');
 const app = express()
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://drivefleet:fTXGUlxHLbDlm9Ev@cluster0.3nxrd1v.mongodb.net/?appName=Cluster0";
+const dotenv = require('dotenv');
+dotenv.config();
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
+const uri = process.env.MONGODB_URI;
+const port = process.env.PORT
+
+     console.log("PORT:", process.env.PORT);
+     console.log("URI:", process.env.MONGODB_URI);
 
 
-const port = process.env.PORT || 5000
-
+app.use(cors());
+app.use(express.json());
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -22,14 +30,46 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
+
+
+    const db = client.db("drivefleet");
+    const addedcarscollection = db.collection("addedcars");
+
+    app.get('/add-car', async (req, res) => {
+      // const result = await addedcarscollection.find().toArray()
+      // res.json(result);
+      const result = await addedcarscollection.find().toArray();
+        res.json(result);
+    })
+
+
+    app.post('/add-car', async (req, res)=> {
+      const carData = req.body;
+      console.log(carData);
+      const result = await addedcarscollection.insertOne(carData);
+
+
+      res.json(result);
+      
+    })
+
+    app.get('/add-car/:id', async (req, res) => {
+      const { id } = req.params
+
+      const result = await addedcarscollection.findOne({ _id: new ObjectId(id)});
+      res.json(result);
+    })
+
+    
+
+
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+  } 
+  finally {
+    // await client.close();
   }
 }
 run().catch(console.dir);
@@ -38,7 +78,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('DriveFleet')
 })
 
 app.listen(port, () => {
