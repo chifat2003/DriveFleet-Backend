@@ -108,7 +108,7 @@ async function run() {
 
 
 
-    // await client.db("admin").command({ ping: 1 });
+    await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   }
   finally {
@@ -124,6 +124,7 @@ app.get('/', (req, res) => {
   res.send('DriveFleet')
 })
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`)
-})
+// app.listen(port, () => {
+//   console.log(`Server running on port ${port}`)
+// })
+module.exports = app;
