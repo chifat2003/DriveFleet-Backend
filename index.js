@@ -61,6 +61,26 @@ async function run() {
       res.json(result);
     })
 
+    app.patch('/add-car/:id', async (req, res) => {
+      const { id } = req.params;
+      const updateData = req.body;
+            console.log("Update Result:", updateData);
+
+      const result = await addedcarscollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updateData }
+      );
+
+      res.json(result);
+    })
+
+    app.delete('/add-car/:id', async (req, res) => {
+      const { id } = req.params;
+
+      const result = await addedcarscollection.deleteOne({ _id: new ObjectId(id) });
+      res.json(result);
+    })
+
     
 
 
